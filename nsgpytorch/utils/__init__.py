@@ -1,1 +1,2 @@
-from .plotting import plot_posterior
+from . import plotting
+from . import inducing
