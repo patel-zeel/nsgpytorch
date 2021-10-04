@@ -1,6 +1,7 @@
 import math
 import torch
 import gpytorch
+from ..add_loss.gibbs_kernel_loss_term import GibbsKernelAddedLossTerm
 
 
 class ExactGPModel(gpytorch.models.ExactGP):
@@ -38,7 +39,7 @@ class GibbsKernel(gpytorch.kernels.Kernel):
         self.register_constraint(
             'raw_inducing_ls', gpytorch.constraints.Positive())
 
-        if kwargs['add_loss']:
+        if self.kwargs['add_loss']:
             self.register_added_loss_term("inducing_gibbs_loss_term")
 
         self.ls_likelihood = gpytorch.likelihoods.GaussianLikelihood()
@@ -59,11 +60,15 @@ class GibbsKernel(gpytorch.kernels.Kernel):
         This part is common in all child classes/kernels.
         """
 
-        if self.training:
+        if self.kwargs['add_loss'] and self.training:
             if not torch.equal(x1, x2):
                 raise RuntimeError("x1 should equal x2 in training mode")
-            new_added_loss_term = nsgpytorch.add_loss.GibbsKernelAddedLossTerm(
-                self.likelihood, self.model, self.inducing_points
+            new_added_loss_term = GibbsKernelAddedLossTerm(
+                self.ls_likelihood,
+                self.ls_model,
+                self.inducing_points,
+                # self.inducing_ls,
+                # x1
             )
             self.update_added_loss_term(
                 "inducing_gibbs_loss_term", new_added_loss_term)

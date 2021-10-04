@@ -21,7 +21,7 @@ def common(train_x, train_y, test_x, name, inducing_points, device):
     likelihood = gpytorch.likelihoods.GaussianLikelihood().to(device)
     ls_kernel = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
     kernel = gpytorch.kernels.ScaleKernel(
-        nsgpytorch.kernels.GibbsRBFKernel(inducing_points, ls_kernel))
+        nsgpytorch.kernels.GibbsRBFKernel(inducing_points, ls_kernel, **{'add_loss': True}))
     model = nsgpytorch.api.models.ExactGPModel(
         train_x, train_y, likelihood, kernel).to(device)
 
@@ -34,14 +34,14 @@ def common(train_x, train_y, test_x, name, inducing_points, device):
     f, ax = nsgpytorch.utils.plotting.plot_posterior(model, likelihood, train_x, train_y,
                                                      test_x, figsize=(16, 6))
 
-    ax[0].set_title('NLML: '+str(losses[-1]))
+    ax[0].set_title('loss: '+str(losses[-1]))
     f.savefig(os.path.join('tests/images', name + '.jpg'))
 
 
 def test_sinenoisy():
     file_name = 'sinenoisy'
     train_x, train_y, test_x = rd.SineNoisy().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -50,7 +50,7 @@ def test_sinenoisy():
 def test_step():
     file_name = 'step'
     train_x, train_y, test_x = rd.Step().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -59,7 +59,7 @@ def test_step():
 def test_smooth1d():
     file_name = 'smooth1d'
     train_x, train_y, test_x = rd.Smooth1D().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -68,7 +68,7 @@ def test_smooth1d():
 def test_sinejump():
     file_name = 'sinejump'
     train_x, train_y, test_x = rd.SineJump1D().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -77,7 +77,7 @@ def test_sinejump():
 def test_olympic():
     file_name = 'olympic'
     train_x, train_y, test_x = rd.Olympic().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -86,7 +86,7 @@ def test_olympic():
 def test_mcycle():
     file_name = 'mcycle'
     train_x, train_y, test_x = rd.MotorcycleHelmet().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
@@ -95,7 +95,7 @@ def test_mcycle():
 def test_della_gatta():
     file_name = 'della_gatta'
     train_x, train_y, test_x = rd.DellaGattaGene().get_data()
-    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=3, seed=0)
+    inducing_points = nsgpytorch.utils.inducing.f_kmeans(train_x, n=10, seed=0)
     device = "cuda"
 
     common(train_x, train_y, test_x, file_name, inducing_points, device)
